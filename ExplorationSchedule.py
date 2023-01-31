@@ -56,5 +56,6 @@ class Bolzmann(ExplorationSchedule):
                     ExplorationSchedule.log.append(0)
                     return np.argmax(qs)
                 probs /= probs.sum()
+            probs = np.squeeze(probs)
             ExplorationSchedule.log.append(1)
             return np.random.choice([i for i in range(qs.shape[0])], p=probs)
