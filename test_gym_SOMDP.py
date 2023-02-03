@@ -10,16 +10,17 @@ if __name__ == '__main__':
     env = gym.make("Taxi-v3")
 
     q = Q_Learning.QLearning(env.observation_space.n, env.action_space.n, init="rand",
-                             exploration_schedule=Bolzmann(0.9, 1000, 0.95, 15), learning_rate=0.7)
+                             # action_map=[0, 1, 2, 3, 4, 5],
+                             exploration_schedule=Epsilon(0.9), learning_rate=0.1)
 
     c = ConvergenceRate()
     historic_RT = EpisodeRewardTracker()
     q.addCallbacks([
-             LearningRateDecay(0.999, period=25),
-             ActionCount(),
-             c,
-             historic_RT
-             ])
+        LearningRateDecay(0.999, period=25),
+        ActionCount(),
+        c,
+        historic_RT
+    ])
     # q = Q_Learning.QLearning((env.observation_space.n, 2), env.action_space.n,
     #                          exploration_schedule=Epsilon(0.9))
 

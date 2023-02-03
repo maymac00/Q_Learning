@@ -14,19 +14,13 @@ class QTable(IQTable):
             self.state_shape = np.array(state_shape)
             self.action_space = np.array(action_space)
             self.reward_space = reward_space
-            if reward_space is None:
-                self.table = np.zeros((np.prod(self.state_shape), action_space))
-            else:
-                self.table = np.zeros((np.prod(self.state_shape), action_space, len(reward_space)))
+            self.table = np.zeros((np.prod(self.state_shape), action_space, len(reward_space)))
 
         if init == "rand":
             self.state_shape = np.array(state_shape)
             self.action_space = np.array(action_space)
             self.reward_space = reward_space
-            if reward_space is None:
-                self.table = np.random.rand(np.prod(self.state_shape), action_space)
-            else:
-                self.table = np.random.rand(np.prod(self.state_shape), action_space, len(reward_space))
+            self.table = np.random.rand(np.prod(self.state_shape), action_space, len(reward_space))
 
     @classmethod
     def fromfile(cls, filename, state_shape, action_space):
@@ -35,6 +29,22 @@ class QTable(IQTable):
         if instance.table.shape != np.zeros((np.prod(state_shape), action_space), dtype="float32"):
             raise ValueError("Shapes of table and environment not consistent")
         return instance
+
+    def getSingleObjective(self, item):
+        if self.table.shape[2] > 1:
+            if type(item) == tuple or type(item) == np.ndarray:
+                return self.reward_space.convert(self.table[self.tuple_to_scalar_state(item)])
+            elif type(item) == int:
+                return self.reward_space.convert(self.table[item])
+            else:
+                raise TypeError("Table not accessible with type " + type(item).__name__)
+        else:
+            if type(item) == tuple or type(item) == np.ndarray:
+                return self.table[self.tuple_to_scalar_state(item)]
+            elif type(item) == int:
+                return self.table[item]
+            else:
+                raise TypeError("Table not accessible with type " + type(item).__name__)
 
     def tuple_to_scalar_state(self, tup):
         if type(tup) == int:
@@ -45,18 +55,10 @@ class QTable(IQTable):
         np.save(filename, self.table)
 
     def __getitem__(self, item):
-        if self.reward_space is None:
-            if type(item) == tuple or type(item) == np.ndarray:
-                return self.table[self.tuple_to_scalar_state(item)]
-            elif type(item) == int:
-                return self.table[item]
-            else:
-                raise TypeError("Table not accessible with type " + type(item).__name__)
+        if type(item) == tuple or type(item) == np.ndarray:
+            return self.table[self.tuple_to_scalar_state(item)]
+        elif type(item) == int:
+            return self.table[item]
         else:
-            if type(item) == tuple or type(item) == np.ndarray:
-                return self.reward_space.convert(self.table[self.tuple_to_scalar_state(item)])
-            elif type(item) == int:
-                return self.reward_space.convert(self.table[item])
-            else:
-                raise TypeError("Table not accessible with type " + type(item).__name__)
+            raise TypeError("Table not accessible with type " + type(item).__name__)
 

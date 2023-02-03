@@ -81,12 +81,15 @@ class ConvergenceRate(UpdateCallback):
         self.alpha_log = []
 
     def onUpdate(self):
+        if not hasattr(self.qlearn.last_gradient, "__iter__"):
+            warnings.warn("You should not use this callback for MOMDP")
+            self.qlearn.callbacks.remove(self)
         self.gradient_log.append(self.qlearn.last_gradient)
         self.alpha_log.append(self.qlearn.alpha)
         pass
 
-    def getUpdateValue(self):
-        return np.array(self.gradient_log)*np.array(self.alpha_log)
+    def getUpdateValue(self, size=None):
+        return np.squeeze(np.array(self.gradient_log)) * np.squeeze(np.array(self.alpha_log))
 
 
 class EpisodeRewardTracker(EpisodeCallback, UpdateCallback):

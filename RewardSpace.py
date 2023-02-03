@@ -12,6 +12,15 @@ class RewardSpace(ABC):
         pass
 
 
+class SingleObjective(RewardSpace):
+
+    def convert(self, arr):
+        return float(arr)
+
+    def __len__(self):
+        return 1
+
+
 class Scalarization(RewardSpace):
 
     def __init__(self, weights):
