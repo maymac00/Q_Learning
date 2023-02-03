@@ -46,14 +46,14 @@ class QTable(IQTable):
 
     def __getitem__(self, item):
         if self.reward_space is None:
-            if type(item) == tuple:
+            if type(item) == tuple or type(item) == np.ndarray:
                 return self.table[self.tuple_to_scalar_state(item)]
             elif type(item) == int:
                 return self.table[item]
             else:
                 raise TypeError("Table not accessible with type " + type(item).__name__)
         else:
-            if type(item) == tuple:
+            if type(item) == tuple or type(item) == np.ndarray:
                 return self.reward_space.convert(self.table[self.tuple_to_scalar_state(item)])
             elif type(item) == int:
                 return self.reward_space.convert(self.table[item])
